@@ -40,7 +40,7 @@ Glass panels, animated backgrounds, sliding pages, and a Home screen where you c
   </tr>
   <tr>
     <td width="50%"><img src="docs/screenshots/theme-sunset.jpg" alt="Sunset theme"><br><sub><b>Sunset preset (PS3-style wave)</b></sub></td>
-    <td width="50%"><img src="docs/screenshots/friends-drawer.jpg" alt="Friends drawer"><br><sub><b>Your friends list as a slide-out drawer</b></sub></td>
+    <td width="50%"><img src="docs/screenshots/panels.jpg" alt="Friends sidebar and bottom log panel"><br><sub><b>Resizable friends sidebar and slide-up log panel</b></sub></td>
   </tr>
 </table>
 
@@ -49,11 +49,16 @@ Glass panels, animated backgrounds, sliding pages, and a Home screen where you c
 ## Features
 
 ### 🏠 Home: your friends' instances as cards
-- One card per instance your friends are in: **world thumbnail, world name, access type, region, live player count** (like `12/40`) and a row of **friend icons** with their status.
+- One card per instance your friends are in: **world thumbnail, world name, access type, region, live player count** (like `12/40`) and a row of **friend icons** with their status. The icon size is adjustable in Theme Studio, with a live example card.
 - **5 × 4 cards per page.** Pages slide left and right with the arrows, page dots, mouse wheel, click-and-drag, or the ← → keys.
 - **Updates live** as friends move between worlds. Player counts refresh every 60 seconds (adjustable) or when you press refresh.
 - Filter by world or friend name, and sort by friends, players or A–Z.
 - The instance you're in is pinned first and marked **You're here**.
+
+### 🧩 Docked panels
+- **Friends sidebar** docked on the right: it's VRCX's full friends list. Drag its edge to make it wider or narrower, and hide or show it with the sidebar button in the top bar.
+- **Bottom panel** that slides up from under the cards, with tabs for **Game Log, Feed, Notifications, Friend Log, Players Here and Moderation**. Click a tab to open it, click it again (or the arrow) to push it back down, and drag its top edge to change the height.
+- **The cards make room.** When either panel opens or you resize it, the grid re-fits: rows and columns drop so cards never get smaller than the minimum size you choose.
 
 ### ▶ One-click join
 - **Join VR** launches VRChat in VR straight into that instance. If VRChat is already running, it sends you there in the running game.
@@ -72,16 +77,18 @@ Glass panels, animated backgrounds, sliding pages, and a Home screen where you c
 | Insights | Instance Activity, Mutual Friends, Hot Worlds, and your custom dashboards |
 | Tools | All Tools, Gallery, Screenshots, Store |
 
+On the **Friends → Locations** page, friend cards show each friend's **profile banner** behind their name. Profile pages show the whole banner at its real shape instead of cropping it.
+
 **Every VRCX feature is still here.** The original pages and dialogs are reused as they are, with the same data, filters, exports and right-click menus, and restyled to match the theme.
 
-The top bar has quick search (Ctrl+K), Direct Access, the notification centre, your friends list as a slide-out drawer, a clock, and your profile.
+The top bar has quick search (Ctrl+K), Direct Access, the notification centre, a button to show or hide the friends sidebar, a clock, and your profile.
 
 ### 🎨 Theme Studio
 - **7 presets:** Midnight Wave, Aurora Glass, Sakura, Nebula, Sunset, Immersive, Focus.
 - **Animated backgrounds:** a PS3-style wave, Aurora, Nebula, Bokeh, **World art** (a blurred image of the card you're hovering), your own image, or a still Minimal gradient.
 - **Accent colour, glass transparency, blur and roundness** sliders.
 - **Animation speed** (set it to 0 to freeze the background and save GPU while you're in VR) and page transitions on or off.
-- **Grid size** (columns and rows), refresh interval, and a 24-hour clock.
+- **Grid size** (max columns and rows, smallest card size), **friend circle size**, sidebar width, bottom panel height, refresh interval, and a 24-hour clock.
 - **One switch back to the classic VRCX layout** if you ever want it.
 
 ---

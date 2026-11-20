@@ -1,6 +1,6 @@
 <template>
     <div id="x-app" class="flex w-screen h-screen overflow-hidden">
-        <div class="vl-root" :class="{ 'is-drawer-open': drawer }">
+        <div class="vl-root">
             <AnimatedBackground :focus-image="focusImage" />
             <div class="vl-shell">
                 <LauncherTopBar
@@ -37,47 +37,85 @@
                         <button
                             type="button"
                             class="vl-iconbtn vl-iconbtn--lg"
-                            :class="{ 'is-active': drawer }"
-                            title="Friends list"
-                            @click="drawer = !drawer">
+                            :class="{ 'is-active': theme.sidebarOpen }"
+                            title="Friends sidebar"
+                            @click="theme.sidebarOpen = !theme.sidebarOpen">
                             <PanelRight class="size-4.5" />
                         </button>
                     </template>
                 </LauncherTopBar>
 
-                <main class="vl-stage" :class="{ 'is-native': route !== 'home' && route !== 'launcher-theme' }">
-                    <Transition :name="transition" mode="out-in">
-                        <HomeScreen
-                            v-if="route === 'home'"
-                            key="home"
-                            :cards="cards"
-                            :stats="stats"
-                            :user-name="mockUser.name"
-                            :refreshing="refreshing"
-                            :last-updated="lastUpdated"
-                            :busy-id="busyId"
-                            :game-running="false"
-                            @refresh="refresh"
-                            @join="join"
-                            @self-invite="(c) => toast(`Invite to ${c.worldName} sent to yourself`)"
-                            @open-world="(c) => toast(`Opens world details: ${c.worldName}`)"
-                            @open-user="(id) => toast(`Opens user dialog for ${id}`)"
-                            @launch-dialog="(c) => toast(`Opens launch dialog for ${c.worldName}`)"
-                            @request-invite="(c) => toast(`Asked ${c.friends[0].name} for an invite`)" />
-                        <ThemeStudio v-else-if="route === 'launcher-theme'" key="theme" />
-                        <PreviewLogs v-else-if="route === 'friend-log'" key="flog" kind="friend" />
-                        <PreviewLogs v-else-if="route === 'game-log'" key="glog" kind="game" />
-                        <div v-else :key="route" class="x-container pv-placeholder">
-                            <div class="vl-empty__orb"><LayoutGrid class="size-7" /></div>
-                            <h2>{{ currentLabel }}</h2>
-                            <p>
-                                In VRCX this page is the original <b>{{ currentLabel }}</b> view with all its features,
-                                restyled to match the launcher. It needs a logged-in VRCX, so the browser preview shows
-                                this placeholder.
-                            </p>
+                <div class="vl-body">
+                    <div class="vl-main">
+                        <main class="vl-stage" :class="{ 'is-native': route !== 'home' && route !== 'launcher-theme' }">
+                            <Transition :name="transition" mode="out-in">
+                                <HomeScreen
+                                    v-if="route === 'home'"
+                                    key="home"
+                                    :cards="cards"
+                                    :stats="stats"
+                                    :user-name="mockUser.name"
+                                    :refreshing="refreshing"
+                                    :last-updated="lastUpdated"
+                                    :busy-id="busyId"
+                                    :game-running="false"
+                                    @refresh="refresh"
+                                    @join="join"
+                                    @self-invite="(c) => toast(`Invite to ${c.worldName} sent to yourself`)"
+                                    @open-world="(c) => toast(`Opens world details: ${c.worldName}`)"
+                                    @open-user="(id) => toast(`Opens user dialog for ${id}`)"
+                                    @launch-dialog="(c) => toast(`Opens launch dialog for ${c.worldName}`)"
+                                    @request-invite="(c) => toast(`Asked ${c.friends[0].name} for an invite`)" />
+                                <ThemeStudio v-else-if="route === 'launcher-theme'" key="theme" />
+                                <PreviewLogs v-else-if="route === 'friend-log'" key="flog" kind="friend" />
+                                <PreviewLogs v-else-if="route === 'game-log'" key="glog" kind="game" />
+                                <div v-else :key="route" class="x-container pv-placeholder">
+                                    <div class="vl-empty__orb"><LayoutGrid class="size-7" /></div>
+                                    <h2>{{ currentLabel }}</h2>
+                                    <p>
+                                        In VRCX this page is the original <b>{{ currentLabel }}</b> view with all its
+                                        features, restyled to match the launcher. It needs a logged-in VRCX, so the
+                                        browser preview shows this placeholder.
+                                    </p>
+                                </div>
+                            </Transition>
+                        </main>
+
+                        <BottomDock
+                            v-model:open="theme.dockOpen"
+                            v-model:active="theme.dockTab"
+                            v-model:height="theme.dockHeight"
+                            :tabs="dockTabs">
+                            <template #default="{ tab }">
+                                <div class="vl-dockview">
+                                    <PreviewLogs v-if="tab === 'game-log'" kind="game" />
+                                    <PreviewLogs v-else-if="tab === 'friend-log'" kind="friend" />
+                                    <div v-else class="pv-dockempty">
+                                        In VRCX this shows the full
+                                        <b>{{ dockTabs.find((d) => d.key === tab)?.label }}</b> view.
+                                    </div>
+                                </div>
+                            </template>
+                        </BottomDock>
+                    </div>
+
+                    <SideDock v-model:width="theme.sidebarWidth" :open="theme.sidebarOpen" :default-width="340">
+                        <div class="pv-drawer vl-scroll">
+                            <h3>Friends · {{ allFriends.length }} online</h3>
+                            <div v-for="f in allFriends" :key="f.id" class="pv-friend">
+                                <span class="vl-avatar" style="margin: 0"
+                                    ><img :src="f.image" alt="" /><i
+                                        class="vl-avatar__dot"
+                                        :class="`is-${f.status}`"></i
+                                ></span>
+                                <div>
+                                    <b>{{ f.name }}</b>
+                                    <small>{{ f.world }}</small>
+                                </div>
+                            </div>
                         </div>
-                    </Transition>
-                </main>
+                    </SideDock>
+                </div>
 
                 <div class="vl-statusbar">
                     <div class="pv-status">
@@ -88,22 +126,6 @@
                     </div>
                 </div>
             </div>
-
-            <aside v-if="drawer" class="vl-drawer pv-drawer vl-scroll">
-                <h3>Friends</h3>
-                <div v-for="f in allFriends" :key="f.id" class="pv-friend">
-                    <span class="vl-avatar" style="margin: 0"
-                        ><img :src="f.image" alt="" /><i class="vl-avatar__dot" :class="`is-${f.status}`"></i
-                    ></span>
-                    <div>
-                        <b>{{ f.name }}</b>
-                        <small>{{ f.world }}</small>
-                    </div>
-                </div>
-            </aside>
-            <Transition name="vl-fade">
-                <div v-if="drawer" class="vl-drawer__scrim" @click="drawer = false"></div>
-            </Transition>
         </div>
         <Toaster position="top-center" theme="dark" rich-colors />
     </div>
@@ -111,18 +133,32 @@
 
 <script setup>
     import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
-    import { Bell, Compass, LayoutGrid, PanelRight, Search } from 'lucide-vue-next';
+    import {
+        Bell,
+        Compass,
+        LayoutGrid,
+        MessageSquare,
+        PanelRight,
+        Radio,
+        ScrollText,
+        Search,
+        Shield,
+        UserRoundPlus,
+        Users
+    } from 'lucide-vue-next';
     import { toast as sonner } from 'vue-sonner';
 
     import { Toaster } from '@/components/ui/sonner';
     import AnimatedBackground from '../components/AnimatedBackground.vue';
+    import BottomDock from '../components/BottomDock.vue';
+    import SideDock from '../components/SideDock.vue';
     import HomeScreen from '../components/HomeScreen.vue';
     import LauncherTopBar from '../components/LauncherTopBar.vue';
     import ThemeStudio from '../components/ThemeStudio.vue';
     import PreviewLogs from './PreviewLogs.vue';
     import { findTabForRoute, launcherTabs } from '../navigation';
     import { focusImage } from '../state';
-    import { applyCssVariables } from '../theme/useLauncherTheme';
+    import { applyCssVariables, launcherTheme as theme } from '../theme/useLauncherTheme';
     import { buildMockCards, mockUser } from './mockData';
 
     const toast = (msg) => sonner(msg);
@@ -157,7 +193,14 @@
     const lastUpdated = ref(Date.now());
     const refreshing = ref(false);
     const busyId = ref('');
-    const drawer = ref(false);
+    const dockTabs = [
+        { key: 'game-log', label: 'Game Log', icon: ScrollText },
+        { key: 'feed', label: 'Feed', icon: Radio },
+        { key: 'notification', label: 'Notifications', icon: MessageSquare, badge: true },
+        { key: 'friend-log', label: 'Friend Log', icon: UserRoundPlus },
+        { key: 'player-list', label: 'Players Here', icon: Users },
+        { key: 'moderation', label: 'Moderation', icon: Shield }
+    ];
 
     const stats = computed(() => ({
         instances: cards.value.length,
@@ -253,6 +296,14 @@
     }
     .pv-drawer {
         padding: 14px;
+        height: 100%;
+    }
+    .pv-dockempty {
+        height: 100%;
+        display: grid;
+        place-items: center;
+        opacity: 0.6;
+        font-size: 13px;
     }
     .pv-drawer h3 {
         font-size: 12px;

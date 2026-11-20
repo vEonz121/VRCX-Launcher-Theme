@@ -1,9 +1,24 @@
 <template>
     <UserContextMenu :user-id="friend.id" :state="friend.state" :location="friend.ref?.location">
         <Card
-            class="friend-card x-hover-card hover:bg-muted relative"
+            class="friend-card x-hover-card hover:bg-muted relative overflow-hidden"
+            :class="{ 'has-banner': !!bannerUrl || !!bannerColor }"
             :style="cardStyle"
             @click="showUserDialog(friend.id)">
+            <span ref="bannerSentinel" class="friend-card__banner" aria-hidden="true">
+                <img
+                    v-if="bannerUrl"
+                    :src="bannerUrl"
+                    class="friend-card__banner-img"
+                    loading="lazy"
+                    decoding="async"
+                    alt=""
+                    @error="onBannerError" />
+                <span
+                    v-else-if="bannerColor"
+                    class="friend-card__banner-color"
+                    :style="{ background: `linear-gradient(120deg, ${bannerColor}, transparent 85%)` }"></span>
+            </span>
             <ProfileEffect
                 :enabled="showCosmetics"
                 :profile-effect="friend.ref.profileEffect"
@@ -57,9 +72,10 @@
     import ProfileEffect from '@/components/ProfileEffect.vue';
     import { Card } from '@/components/ui/card';
     import { Pencil, User } from 'lucide-vue-next';
-    import { computed } from 'vue';
+    import { computed, ref, toRef } from 'vue';
 
     import { useUserDisplay } from '../../../composables/useUserDisplay';
+    import { useFriendBanner } from '../../../launcher/composables/useFriendBanner';
 
     import Location from '../../../components/Location.vue';
     import UserContextMenu from '../../../components/UserContextMenu.vue';
@@ -89,6 +105,10 @@
             default: 1
         }
     });
+
+    // profile banner behind the card (fetched lazily, see useFriendBanner)
+    const bannerSentinel = ref(null);
+    const { bannerUrl, bannerColor, onBannerError } = useFriendBanner(toRef(props, 'friend'), bannerSentinel);
 
     const cardStyle = computed(() => ({
         '--card-scale': props.cardScale,
@@ -134,6 +154,59 @@
 </script>
 
 <style scoped>
+    .friend-card__banner {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        border-radius: inherit;
+        overflow: hidden;
+    }
+    .friend-card__banner-img,
+    .friend-card__banner-color {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center 30%;
+        opacity: 0.85;
+        transition:
+            transform 600ms ease,
+            opacity 300ms;
+    }
+    .friend-card__banner-color {
+        opacity: 0.45;
+    }
+    .friend-card:hover .friend-card__banner-img {
+        transform: scale(1.06);
+        opacity: 1;
+    }
+    /* keep names/locations readable over the picture */
+    .friend-card.has-banner .friend-card__banner::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(90deg, rgb(0 0 0 / 0.72) 0%, rgb(0 0 0 / 0.35) 55%, rgb(0 0 0 / 0.1) 100%),
+            linear-gradient(0deg, rgb(0 0 0 / 0.55) 0%, transparent 45%);
+    }
+    .friend-card.has-banner {
+        color: #fff;
+    }
+    .friend-card.has-banner :deep(.text-muted-foreground) {
+        color: rgb(255 255 255 / 0.78);
+    }
+    .friend-card__header,
+    .friend-card__body {
+        position: relative;
+        z-index: 1;
+        text-shadow: 0 1px 3px rgb(0 0 0 / 0.55);
+    }
+    .friend-card__status-dot {
+        z-index: 2;
+    }
+
     .friend-card {
         --card-scale: 1;
         --card-spacing: 1;

@@ -267,11 +267,12 @@ export const useFriendStore = defineStore('Friend', () => {
     });
 
     watch(
-        [router.currentRoute, () => dashboardStore.dashboards],
+        [router.currentRoute, () => dashboardStore.dashboards, () => dashboardStore.dockedPanels],
         ([value]) => {
             const isDashboardPanel =
                 value.name === 'dashboard' && dashboardStore.getDashboard(value.params.id, 'friend-log');
-            if (value.name === 'friend-log' || isDashboardPanel) {
+            const isDocked = (dashboardStore.dockedPanels || []).includes('friend-log');
+            if (value.name === 'friend-log' || isDashboardPanel || isDocked) {
                 initFriendLogHistoryTable();
             } else {
                 friendLogTable.value.data = [];

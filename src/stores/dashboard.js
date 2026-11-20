@@ -58,6 +58,11 @@ function sanitizeDashboard(dashboard) {
 
 export const useDashboardStore = defineStore('dashboard', () => {
     const dashboards = ref([]);
+    /** View keys currently shown outside their route (launcher bottom dock), so their data keeps loading */
+    const dockedPanels = ref([]);
+    function setDockedPanels(keys) {
+        dockedPanels.value = Array.isArray(keys) ? [...keys] : [];
+    }
     const loaded = ref(false);
     const editingDashboardId = ref(null);
 
@@ -185,6 +190,8 @@ export const useDashboardStore = defineStore('dashboard', () => {
 
     return {
         dashboards,
+        dockedPanels,
+        setDockedPanels,
         loaded,
         editingDashboardId,
         dashboardNavKeys,

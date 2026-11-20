@@ -369,37 +369,228 @@ html.vl-launcher .vl-stage.is-native .x-container {
     border-top: 0 !important;
 }
 
-/* friends drawer (original sidebar) */
-.vl-drawer {
+/* ---------- docked panels ---------- */
+.vl-body {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+}
+.vl-main {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* right: friends sidebar */
+.vl-sidedock {
+    position: relative;
+    flex: none;
+    width: var(--dock-w);
+    margin: 6px 0 10px;
+    overflow: clip;
+    overflow-clip-margin: 30px;
+    transition:
+        width calc(var(--vl-dur) * 1.1) var(--vl-ease),
+        margin calc(var(--vl-dur) * 1.1) var(--vl-ease);
+}
+.vl-sidedock.is-open {
+    margin-right: 14px;
+}
+.vl-sidedock.is-resizing {
+    transition: none;
+}
+.vl-sidedock__inner {
     position: absolute;
-    z-index: 30;
-    top: 70px;
-    right: 14px;
-    bottom: 44px;
-    width: min(380px, 40vw);
+    top: 0;
+    bottom: 0;
+    right: 0;
     border-radius: var(--vl-radius);
     overflow: hidden;
     background: var(--vl-glass-strong);
     border: 1px solid var(--vl-glass-border);
     backdrop-filter: blur(calc(var(--vl-blur) + 8px)) saturate(1.5);
-    box-shadow: 0 30px 80px -20px oklch(0 0 0 / 0.7);
-    animation: vl-drawer-in var(--vl-dur) var(--vl-ease);
+    box-shadow: 0 20px 60px -24px oklch(0 0 0 / 0.7);
+    transition: opacity var(--vl-dur) var(--vl-ease);
 }
-.vl-drawer .x-aside-container {
+.vl-sidedock:not(.is-open) .vl-sidedock__inner {
+    opacity: 0;
+    pointer-events: none;
+}
+.vl-sidedock__inner > * {
     height: 100%;
-    background: transparent;
 }
-.vl-drawer__scrim {
+.vl-sidedock .x-aside-container {
+    height: 100%;
+    width: 100% !important;
+    max-width: none !important;
+    background: transparent !important;
+    border: 0 !important;
+}
+.vl-sidedock__handle {
     position: absolute;
-    inset: 0;
-    z-index: 29;
-    background: oklch(0 0 0 / 0.25);
+    z-index: 5;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 10px;
+    cursor: col-resize;
 }
-@keyframes vl-drawer-in {
-    from {
-        opacity: 0;
-        transform: translateX(30px) scale(0.98);
-    }
+.vl-sidedock__handle::after,
+.vl-bottomdock__handle::after {
+    content: '';
+    position: absolute;
+    border-radius: 999px;
+    background: var(--vl-accent);
+    opacity: 0;
+    transition: opacity 200ms;
+    box-shadow: 0 0 10px var(--vl-accent-glow);
+}
+.vl-sidedock__handle::after {
+    left: 3px;
+    top: 50%;
+    width: 4px;
+    height: 56px;
+    margin-top: -28px;
+}
+.vl-sidedock__handle:hover::after,
+.vl-sidedock.is-resizing .vl-sidedock__handle::after,
+.vl-bottomdock__handle:hover::after,
+.vl-bottomdock.is-resizing .vl-bottomdock__handle::after {
+    opacity: 1;
+}
+
+/* bottom: logs dock */
+.vl-bottomdock {
+    position: relative;
+    flex: none;
+    margin: 0 22px 10px;
+    border-radius: var(--vl-radius);
+    background: var(--vl-glass);
+    border: 1px solid var(--vl-glass-border);
+    backdrop-filter: blur(var(--vl-blur)) saturate(1.4);
+    -webkit-backdrop-filter: blur(var(--vl-blur)) saturate(1.4);
+    box-shadow: 0 -10px 40px -24px oklch(0 0 0 / 0.6);
+    transition: background var(--vl-dur);
+}
+.vl-bottomdock.is-open {
+    background: var(--vl-glass-strong);
+}
+.vl-bottomdock__handle {
+    position: absolute;
+    z-index: 5;
+    left: 0;
+    right: 0;
+    top: -6px;
+    height: 12px;
+    cursor: row-resize;
+}
+.vl-bottomdock__handle::after {
+    top: 4px;
+    left: 50%;
+    width: 56px;
+    height: 4px;
+    margin-left: -28px;
+}
+.vl-bottomdock__bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 6px;
+}
+.vl-bottomdock__toggle {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    flex: none;
+    border-radius: 50%;
+    background: oklch(1 0 0 / 0.08);
+    border: 1px solid oklch(1 0 0 / 0.12);
+    cursor: pointer;
+    transition:
+        background 180ms,
+        transform 200ms var(--vl-spring);
+}
+.vl-bottomdock__toggle:hover {
+    background: var(--vl-accent-soft);
+    transform: scale(1.08);
+}
+.vl-bottomdock__tabs {
+    display: flex;
+    gap: 4px;
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+.vl-bottomdock__extra {
+    margin-left: auto;
+    display: flex;
+    gap: 4px;
+}
+.vl-dtab {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 30px;
+    padding: 0 12px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 600;
+    white-space: nowrap;
+    color: oklch(1 0 0 / 0.65);
+    border: 1px solid transparent;
+    transition: all 220ms var(--vl-ease);
+    cursor: pointer;
+}
+.vl-dtab:hover {
+    color: #fff;
+    background: oklch(1 0 0 / 0.07);
+}
+.vl-dtab.is-active {
+    color: #fff;
+    background: var(--vl-accent-soft);
+    border-color: oklch(0.72 0.17 var(--vl-hue) / 0.45);
+}
+.vl-dtab__badge {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--vl-accent);
+    box-shadow: 0 0 8px var(--vl-accent-glow);
+}
+.vl-bottomdock__body {
+    height: var(--dock-h);
+    overflow: hidden;
+    transition: height calc(var(--vl-dur) * 1.1) var(--vl-ease);
+}
+.vl-bottomdock.is-resizing .vl-bottomdock__body {
+    transition: none;
+}
+.vl-bottomdock__content {
+    border-top: 1px solid oklch(1 0 0 / 0.08);
+}
+.vl-dockview {
+    height: 100%;
+    overflow: auto;
+}
+.vl-dockview > *,
+.vl-dockview .x-container {
+    height: 100% !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+}
+.vl-dockview .x-container {
+    padding: 8px 12px !important;
+}
+.vl-main .vl-stage {
+    padding-bottom: 10px;
 }
 .vl-fade-enter-active,
 .vl-fade-leave-active {
@@ -935,6 +1126,7 @@ html.vl-launcher .vl-stage.is-native .x-container {
 }
 .vl-card__friends {
     min-width: 0;
+    flex: 0 1 auto;
     font-size: 11.5px;
     opacity: 0.7;
     white-space: nowrap;
@@ -944,19 +1136,24 @@ html.vl-launcher .vl-stage.is-native .x-container {
 .vl-avatars {
     display: flex;
     align-items: center;
-    flex: none;
+    /* shrink (and fade out) instead of pushing the Join button off the card */
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    padding: 5px 3px;
+    margin: -5px -3px;
 }
 .vl-avatar {
     position: relative;
-    width: 26px;
-    height: 26px;
+    width: var(--vl-avatar, 32px);
+    height: var(--vl-avatar, 32px);
     border-radius: 50%;
-    margin-left: -7px;
+    margin-left: calc(var(--vl-avatar, 32px) * -0.26);
     border: 2px solid oklch(0.22 0.03 var(--vl-hue));
     background: oklch(0.3 0.04 var(--vl-hue));
     display: grid;
     place-items: center;
-    font-size: 11px;
+    font-size: calc(var(--vl-avatar, 32px) * 0.4);
     font-weight: 700;
     flex: none;
     cursor: pointer;
@@ -974,7 +1171,7 @@ html.vl-launcher .vl-stage.is-native .x-container {
     object-fit: cover;
 }
 .vl-card:hover .vl-avatar:not(:first-child) {
-    margin-left: -3px;
+    margin-left: calc(var(--vl-avatar, 32px) * -0.1);
 }
 .vl-avatar:hover {
     transform: translateY(-3px) scale(1.15);
@@ -989,8 +1186,8 @@ html.vl-launcher .vl-stage.is-native .x-container {
     position: absolute;
     right: -2px;
     bottom: -2px;
-    width: 9px;
-    height: 9px;
+    width: max(9px, calc(var(--vl-avatar, 32px) * 0.3));
+    height: max(9px, calc(var(--vl-avatar, 32px) * 0.3));
     border-radius: 50%;
     border: 2px solid oklch(0.22 0.03 var(--vl-hue));
     background: var(--status-online);
@@ -1059,6 +1256,11 @@ html.vl-launcher .vl-stage.is-native .x-container {
     border: 1px solid oklch(1 0 0 / 0.2);
     box-shadow: none;
 }
+@container (max-width: 280px) {
+    .vl-card__friends {
+        display: none;
+    }
+}
 @container (max-width: 210px) {
     .vl-join__label {
         display: none;
@@ -1078,8 +1280,8 @@ html.vl-launcher .vl-stage.is-native .x-container {
         gap: 4px;
     }
     .vl-avatar {
-        width: 22px;
-        height: 22px;
+        width: calc(var(--vl-avatar, 32px) * 0.85);
+        height: calc(var(--vl-avatar, 32px) * 0.85);
     }
     .vl-card__badges .vl-pill--ghost {
         display: none;
@@ -1469,4 +1671,21 @@ html.vl-launcher [data-slot='table-row']:hover {
 }
 :root.vl-launcher[style*='--vl-dur: 0ms'] .vl-card {
     animation: none !important;
+}
+
+/* theme studio: example card */
+.vl-sample {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(220px, 300px);
+    gap: 18px;
+    align-items: center;
+}
+.vl-sample__card {
+    height: 200px;
+    display: grid;
+}
+@media (max-width: 900px) {
+    .vl-sample {
+        grid-template-columns: 1fr;
+    }
 }

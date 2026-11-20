@@ -1,7 +1,7 @@
 <template>
     <div class="rounded-b-lg rounded-t-[15px] bg-(--profile-card) overflow-hidden flex flex-col relative">
         <ProfileEffect :profile-effect="userDialog.ref.profileEffect" class="z-1" />
-        <div class="relative aspect-17/6">
+        <div class="relative" :class="{ 'aspect-17/6': !bannerAspect }" :style="bannerBoxStyle">
             <div
                 v-if="
                     userDialog.loading ||
@@ -13,13 +13,22 @@
                 :style="{
                     backgroundColor: userDialog.ref.bannerColor ? `#${userDialog.ref.bannerColor}` : 'hsl(var(--muted))'
                 }"></div>
-            <img
-                v-else
-                class="absolute inset-0 block h-full w-full cursor-pointer object-cover"
-                :src="userDialog.ref.bannerUrl"
-                @click="showFullscreenImageDialog(userDialog.ref.bannerUrl)"
-                @error="profileImageError = true"
-                loading="lazy" />
+            <template v-else>
+                <!-- blurred fill behind the banner, only visible if its shape is unusually tall/wide -->
+                <img
+                    class="absolute inset-0 block h-full w-full object-cover scale-110 blur-xl opacity-60 pointer-events-none"
+                    :src="userDialog.ref.bannerUrl"
+                    alt=""
+                    aria-hidden="true" />
+                <!-- the box takes the banner's own shape, so the whole picture shows (no cropping) -->
+                <img
+                    class="absolute inset-0 block h-full w-full cursor-pointer object-contain"
+                    :src="userDialog.ref.bannerUrl"
+                    @click="showFullscreenImageDialog(userDialog.ref.bannerUrl)"
+                    @load="onBannerLoad"
+                    @error="profileImageError = true"
+                    loading="lazy" />
+            </template>
             <div class="absolute bottom-0 pt-10 right-2.5 z-30 translate-y-1/2 flex gap-1.5">
                 <TooltipWrapper
                     v-if="userDialog.isBlock"
@@ -581,6 +590,15 @@
     const { showEditProfileDialog } = useUserStore();
 
     const profileImageError = ref(false);
+    /** Width / height of the uploaded banner, so the header matches it instead of cropping */
+    const bannerAspect = ref(0);
+    const bannerBoxStyle = computed(() => (bannerAspect.value ? { aspectRatio: String(bannerAspect.value) } : {}));
+    function onBannerLoad(e) {
+        const { naturalWidth: w, naturalHeight: h } = e.target;
+        if (!w || !h) return;
+        // keep extreme shapes sensible; the blurred fill covers any leftover space
+        bannerAspect.value = Math.min(4, Math.max(1.4, w / h));
+    }
     const userIconError = ref(false);
     const hasAvatarSet = ref(false);
     const avatarImageUrl = computed(() => {
@@ -605,8 +623,9 @@
     );
 
     watch(
-        () => userDialog.value.id,
+        () => [userDialog.value.id, userDialog.value.ref?.bannerUrl],
         () => {
+            bannerAspect.value = 0;
             profileImageError.value = false;
             userIconError.value = false;
         }

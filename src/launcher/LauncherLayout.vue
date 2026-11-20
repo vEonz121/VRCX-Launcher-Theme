@@ -1,6 +1,6 @@
 <template>
     <template v-if="watchState.isLoggedIn">
-        <div class="vl-root" :class="{ 'is-drawer-open': friendsDrawerOpen }">
+        <div class="vl-root">
             <AnimatedBackground :focus-image="focusImage" />
 
             <div class="vl-shell">
@@ -39,36 +39,62 @@
                         <button
                             type="button"
                             class="vl-iconbtn vl-iconbtn--lg"
-                            :class="{ 'is-active': friendsDrawerOpen }"
-                            title="Friends list"
-                            @click="friendsDrawerOpen = !friendsDrawerOpen">
+                            :class="{ 'is-active': theme.sidebarOpen }"
+                            :title="theme.sidebarOpen ? 'Hide friends sidebar' : 'Show friends sidebar'"
+                            @click="theme.sidebarOpen = !theme.sidebarOpen">
                             <PanelRight class="size-4.5" />
                         </button>
                     </template>
                 </LauncherTopBar>
 
-                <main class="vl-stage" :class="{ 'is-home': route.name === 'home', 'is-native': isNativeRoute }">
-                    <RouterView v-slot="{ Component }">
-                        <Transition :name="transitionName" mode="out-in">
-                            <KeepAlive exclude="ChartsInstance, ChartsMutual">
-                                <component :is="Component" />
-                            </KeepAlive>
-                        </Transition>
-                    </RouterView>
-                </main>
+                <div class="vl-body">
+                    <div class="vl-main">
+                        <main
+                            class="vl-stage"
+                            :class="{ 'is-home': route.name === 'home', 'is-native': isNativeRoute }">
+                            <RouterView v-slot="{ Component }">
+                                <Transition :name="transitionName" mode="out-in">
+                                    <KeepAlive exclude="ChartsInstance, ChartsMutual">
+                                        <component :is="Component" />
+                                    </KeepAlive>
+                                </Transition>
+                            </RouterView>
+                        </main>
+
+                        <BottomDock
+                            v-model:open="theme.dockOpen"
+                            v-model:active="theme.dockTab"
+                            v-model:height="theme.dockHeight"
+                            :tabs="dockTabs"
+                            :default-height="300">
+                            <template #default="{ tab }">
+                                <div class="vl-dockview">
+                                    <component :is="panelComponentMap[tab]" v-if="panelComponentMap[tab]" />
+                                </div>
+                            </template>
+                            <template #extra>
+                                <button
+                                    v-if="theme.dockOpen"
+                                    type="button"
+                                    class="vl-dtab"
+                                    title="Open as a full page"
+                                    @click="navigate({ route: theme.dockTab })">
+                                    <Maximize2 class="size-3.5" />
+                                </button>
+                            </template>
+                        </BottomDock>
+                    </div>
+
+                    <!-- the original VRCX friends sidebar, docked and resizable -->
+                    <SideDock v-model:width="theme.sidebarWidth" :open="theme.sidebarOpen" :default-width="340">
+                        <Sidebar />
+                    </SideDock>
+                </div>
 
                 <div class="vl-statusbar">
                     <StatusBar />
                 </div>
             </div>
-
-            <!-- the original friends sidebar, kept mounted so Ctrl+K, notifications etc. keep working -->
-            <aside v-show="friendsDrawerOpen" class="vl-drawer">
-                <Sidebar />
-            </aside>
-            <Transition name="vl-fade">
-                <div v-if="friendsDrawerOpen" class="vl-drawer__scrim" @click="friendsDrawerOpen = false"></div>
-            </Transition>
         </div>
 
         <!-- ## Dialogs (same set as the classic layout) ## -->
@@ -97,11 +123,23 @@
 </template>
 
 <script setup>
-    import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+    import { computed, onBeforeUnmount, ref, watch } from 'vue';
     import { storeToRefs } from 'pinia';
     import { useI18n } from 'vue-i18n';
     import { useRoute, useRouter } from 'vue-router';
-    import { Bell, Compass, PanelRight, Search } from 'lucide-vue-next';
+    import {
+        Bell,
+        Compass,
+        Maximize2,
+        MessageSquare,
+        PanelRight,
+        Radio,
+        ScrollText,
+        Search,
+        Shield,
+        UserRoundPlus,
+        Users
+    } from 'lucide-vue-next';
 
     import {
         useDashboardStore,
@@ -114,12 +152,16 @@
     import { useUserDisplay } from '../composables/useUserDisplay';
     import { watchState } from '../services/watchState';
     import { findTabForRoute, launcherTabs } from './navigation';
-    import { focusImage, friendsDrawerOpen } from './state';
+    import { focusImage } from './state';
+    import { launcherTheme as theme } from './theme/useLauncherTheme';
+    import { panelComponentMap } from '../views/Dashboard/components/panelRegistry';
     import { statusKey } from './composables/instanceCardUtils';
     import { useLauncherShellClass } from './theme/useLauncherShellClass';
 
     import AnimatedBackground from './components/AnimatedBackground.vue';
+    import BottomDock from './components/BottomDock.vue';
     import LauncherTopBar from './components/LauncherTopBar.vue';
+    import SideDock from './components/SideDock.vue';
 
     import AvatarImportDialog from '../views/Favorites/dialogs/AvatarImportDialog.vue';
     import ChangelogDialog from '../views/Settings/dialogs/ChangelogDialog.vue';
@@ -226,18 +268,41 @@
         { immediate: true }
     );
 
-    // close drawer with Escape
-    function onKey(e) {
-        if (
-            e.key === 'Escape' &&
-            friendsDrawerOpen.value &&
-            !document.querySelector('[role="dialog"][data-state="open"]')
-        ) {
-            friendsDrawerOpen.value = false;
-        }
-    }
-    onMounted(() => window.addEventListener('keydown', onKey));
-    onBeforeUnmount(() => window.removeEventListener('keydown', onKey));
+    // ── bottom dock ──
+    const dockTabs = computed(() => [
+        { key: 'game-log', label: label({ label: 'Game Log', labelKey: 'nav_tooltip.game_log' }), icon: ScrollText },
+        { key: 'feed', label: label({ label: 'Feed', labelKey: 'nav_tooltip.feed' }), icon: Radio },
+        {
+            key: 'notification',
+            label: label({ label: 'Notifications', labelKey: 'nav_tooltip.notification' }),
+            icon: MessageSquare,
+            badge: hasUnseenNotifications.value
+        },
+        {
+            key: 'friend-log',
+            label: label({ label: 'Friend Log', labelKey: 'nav_tooltip.friend_log' }),
+            icon: UserRoundPlus
+        },
+        {
+            key: 'player-list',
+            label: label({ label: 'Players Here', labelKey: 'nav_tooltip.player_list' }),
+            icon: Users
+        },
+        { key: 'moderation', label: label({ label: 'Moderation', labelKey: 'nav_tooltip.moderation' }), icon: Shield }
+    ]);
+    if (!dockTabs.value.some((tb) => tb.key === theme.dockTab)) theme.dockTab = 'game-log';
+
+    // tell the stores which views are on screen in the dock so their data keeps loading
+    watch(
+        () => [theme.dockOpen, theme.dockTab],
+        ([open, tab]) => {
+            dashboardStore.setDockedPanels(open ? [tab] : []);
+        },
+        { immediate: true }
+    );
+    onBeforeUnmount(() => {
+        dashboardStore.setDockedPanels([]);
+    });
 
     watch(
         () => watchState.isLoggedIn,

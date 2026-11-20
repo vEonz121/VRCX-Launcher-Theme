@@ -66,6 +66,8 @@
             :cards="filteredCards"
             :columns="Number(theme.gridColumns) || 5"
             :rows="Number(theme.gridRows) || 4"
+            :min-card-width="Number(theme.minCardWidth) || 210"
+            :min-card-height="Number(theme.minCardHeight) || 150"
             :join-mode="theme.joinMode"
             :busy-id="busyId"
             :focused-id="focusedId"

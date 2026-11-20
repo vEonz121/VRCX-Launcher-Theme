@@ -86,7 +86,18 @@ const defaults = Object.freeze({
     includeSolo: true, // show instances with a single friend
     joinMode: 'vr', // 'vr' | 'desktop'
     sortBy: 'friends', // 'friends' | 'players' | 'name'
-    clock24h: true
+    clock24h: true,
+    // docked panels
+    sidebarOpen: true,
+    sidebarWidth: 340,
+    dockOpen: false,
+    dockHeight: 300,
+    dockTab: 'game-log',
+    // friend cards
+    friendBanners: true,
+    avatarSize: 32, // friend circles on Home cards, px
+    minCardWidth: 210,
+    minCardHeight: 150
 });
 
 function load() {
@@ -142,6 +153,7 @@ export function applyCssVariables(root = typeof document !== 'undefined' ? docum
     s.setProperty('--vl-motion', String(clamp(state.motion, 0, 3)));
     s.setProperty('--vl-tint', String(clamp(state.tint, 0, 1)));
     s.setProperty('--vl-dur', state.transitions ? '420ms' : '0ms');
+    s.setProperty('--vl-avatar', `${clamp(state.avatarSize, 18, 56)}px`);
 }
 
 export function useLauncherTheme() {

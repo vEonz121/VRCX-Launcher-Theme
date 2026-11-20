@@ -2,7 +2,7 @@
     <div
         ref="rootRef"
         class="vl-pager"
-        :style="{ '--cols': columns, '--rows': rows }"
+        :style="{ '--cols': fitCols, '--rows': fitRows }"
         @wheel="onWheel"
         @pointerdown="onPointerDown">
         <div v-if="!cards.length" class="vl-pager__empty">
@@ -10,7 +10,7 @@
         </div>
 
         <template v-else>
-            <div class="vl-pager__viewport">
+            <div ref="viewportRef" class="vl-pager__viewport">
                 <div
                     class="vl-pager__track"
                     :class="{ 'is-dragging': dragging }"
@@ -86,7 +86,10 @@
         rows: { type: Number, default: 4 },
         joinMode: { type: String, default: 'vr' },
         busyId: { type: String, default: '' },
-        focusedId: { type: String, default: '' }
+        focusedId: { type: String, default: '' },
+        /** Cards never shrink below this; rows/columns drop instead (e.g. when side panels open) */
+        minCardWidth: { type: Number, default: 210 },
+        minCardHeight: { type: Number, default: 150 }
     });
 
     const emit = defineEmits([
@@ -101,8 +104,41 @@
     ]);
 
     const rootRef = ref(null);
+    const viewportRef = ref(null);
     const page = ref(0);
-    const perPage = computed(() => Math.max(1, props.columns * props.rows));
+
+    // ── fit the grid to the space available ──
+    const box = ref({ w: 0, h: 0 });
+    const GAP = 14;
+    const fitCols = computed(() => {
+        if (!box.value.w) return props.columns;
+        const fit = Math.floor((box.value.w + GAP) / (props.minCardWidth + GAP));
+        return Math.max(1, Math.min(props.columns, fit));
+    });
+    const fitRows = computed(() => {
+        if (!box.value.h) return props.rows;
+        const fit = Math.floor((box.value.h + GAP) / (props.minCardHeight + GAP));
+        return Math.max(1, Math.min(props.rows, fit));
+    });
+    let ro = null;
+    function measureBox() {
+        const el = viewportRef.value;
+        if (!el) return;
+        box.value = { w: el.clientWidth - 20, h: el.clientHeight - 20 };
+    }
+    watch(viewportRef, (el, old) => {
+        if (old) ro?.unobserve(old);
+        if (el) {
+            ro ??= new ResizeObserver(measureBox);
+            ro.observe(el);
+            measureBox();
+        }
+    });
+    // keep roughly the same cards on screen when the page size changes
+    const perPage = computed(() => Math.max(1, fitCols.value * fitRows.value));
+    watch(perPage, (now, before) => {
+        if (before && now !== before) page.value = Math.floor((page.value * before) / now);
+    });
 
     const pages = computed(() => {
         const out = [];
@@ -197,6 +233,7 @@
 
     onMounted(() => window.addEventListener('keydown', onKey));
     onBeforeUnmount(() => {
+        ro?.disconnect();
         window.removeEventListener('keydown', onKey);
         window.removeEventListener('pointermove', onPointerMove);
     });

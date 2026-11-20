@@ -131,12 +131,13 @@ export const useGameLogStore = defineStore('GameLog', () => {
     );
 
     watch(
-        [router.currentRoute, () => dashboardStore.dashboards],
+        [router.currentRoute, () => dashboardStore.dashboards, () => dashboardStore.dockedPanels],
         async ([value]) => {
             await initPromise;
             const isDashboardPanel =
                 value.name === 'dashboard' && dashboardStore.getDashboard(value.params.id, 'game-log');
-            if (value.name === 'game-log' || isDashboardPanel) {
+            const isDocked = (dashboardStore.dockedPanels || []).includes('game-log');
+            if (value.name === 'game-log' || isDashboardPanel || isDocked) {
                 if (sessionsViewMode.value === 'sessions') {
                     loadSessionsSegments();
                 } else {

@@ -51,6 +51,27 @@
             </label>
         </section>
 
+        <section class="vl-panel">
+            <h2>Friend icons</h2>
+            <div class="vl-sample">
+                <div>
+                    <Range
+                        v-model="theme.avatarSize"
+                        label="Friend circle size"
+                        :min="20"
+                        :max="48"
+                        :step="1"
+                        unit="px" />
+                    <p class="vl-hint">
+                        Size of the friend pictures on Home cards. The example card on the right updates as you drag.
+                    </p>
+                </div>
+                <div class="vl-sample__card">
+                    <InstanceCard :card="sampleCard" :join-mode="theme.joinMode" />
+                </div>
+            </div>
+        </section>
+
         <div class="vl-studio__cols">
             <section class="vl-panel">
                 <h2>Accent colour</h2>
@@ -85,8 +106,22 @@
 
             <section class="vl-panel">
                 <h2>Home grid</h2>
-                <Range v-model="theme.gridColumns" label="Columns" :min="2" :max="8" :step="1" />
-                <Range v-model="theme.gridRows" label="Rows" :min="1" :max="6" :step="1" />
+                <Range v-model="theme.gridColumns" label="Max columns" :min="2" :max="8" :step="1" />
+                <Range v-model="theme.gridRows" label="Max rows" :min="1" :max="6" :step="1" />
+                <Range
+                    v-model="theme.minCardWidth"
+                    label="Smallest card width"
+                    :min="160"
+                    :max="360"
+                    :step="10"
+                    unit="px" />
+                <Range
+                    v-model="theme.minCardHeight"
+                    label="Smallest card height"
+                    :min="110"
+                    :max="260"
+                    :step="10"
+                    unit="px" />
                 <Range
                     v-model="theme.refreshSeconds"
                     label="Player count refresh"
@@ -95,6 +130,25 @@
                     :step="15"
                     unit="s" />
                 <Toggle v-model="theme.includeSolo" label="Show instances with one friend" />
+                <p class="vl-hint">
+                    When the friends sidebar or bottom panel takes space, rows and columns drop so cards never get
+                    smaller than this.
+                </p>
+            </section>
+
+            <section class="vl-panel">
+                <h2>Panels &amp; friends</h2>
+                <Toggle v-model="theme.sidebarOpen" label="Friends sidebar" />
+                <Range v-model="theme.sidebarWidth" label="Sidebar width" :min="240" :max="640" :step="10" unit="px" />
+                <Range
+                    v-model="theme.dockHeight"
+                    label="Bottom panel height"
+                    :min="160"
+                    :max="700"
+                    :step="10"
+                    unit="px" />
+                <Toggle v-model="theme.friendBanners" label="Profile banners on friend cards" />
+                <p class="vl-hint">You can also drag the panel edges to resize them.</p>
             </section>
 
             <section class="vl-panel">
@@ -117,9 +171,38 @@
     import { defineComponent, h } from 'vue';
     import { RotateCcw } from 'lucide-vue-next';
 
+    import InstanceCard from './InstanceCard.vue';
+    import { avatarArt, worldArt } from '../preview/mockData';
+
     import { accentPresets, backgroundPresets, themePresets, useLauncherTheme } from '../theme/useLauncherTheme';
 
     const { theme, applyPreset, reset } = useLauncherTheme();
+
+    // example card for the friend-circle slider (made-up data, generated pictures)
+    const sampleNames = ['Raido', 'Michael', 'Serion', 'Nova', 'Pixel', 'Kitsune', 'Echo'];
+    const sampleArt = worldArt('Sample World', 225);
+    const sampleCard = {
+        id: 'sample',
+        location: 'wrld_sample:1',
+        worldName: 'Example World',
+        thumbnail: sampleArt,
+        image: sampleArt,
+        loading: false,
+        accessKind: 'friends',
+        accessLabel: 'Friends+',
+        joinable: true,
+        region: 'EU',
+        isOwnLocation: false,
+        userCount: 14,
+        capacity: 32,
+        friendCount: sampleNames.length,
+        friends: sampleNames.map((n, i) => ({
+            id: `sample_${i}`,
+            name: n,
+            image: avatarArt(n),
+            status: ['joinme', 'active', 'askme', 'busy'][i % 4]
+        }))
+    };
 
     const Range = defineComponent({
         props: {
