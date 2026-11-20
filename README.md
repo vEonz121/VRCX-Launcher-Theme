@@ -5,8 +5,8 @@
 **A modern, console-style launcher theme for [VRCX](https://github.com/vrcx-team/VRCX).**
 Glass panels, animated backgrounds, sliding pages, and a Home screen where you can see where your friends are and join them in VR with one click.
 
-[**▶ Try the live preview**](https://veonz.github.io/VRCX-Launcher-Theme/) &nbsp;·&nbsp;
-[**⬇ Download**](https://github.com/vEonz/VRCX-Launcher-Theme/releases/latest) &nbsp;·&nbsp;
+[**▶ Try the live preview**](https://veonz121.github.io/VRCX-Launcher-Theme/) &nbsp;·&nbsp;
+[**⬇ Download**](https://github.com/vEonz121/VRCX-Launcher-Theme/releases/latest) &nbsp;·&nbsp;
 [**How to install**](#-how-to-install)
 
 <img src="docs/screenshots/home.jpg" alt="Home screen with instance cards" width="100%">
@@ -88,7 +88,7 @@ The top bar has quick search (Ctrl+K), Direct Access, the notification centre, y
 
 ## 🧪 Try the preview
 
-**[veonz.github.io/VRCX-Launcher-Theme](https://veonz.github.io/VRCX-Launcher-Theme/)**
+**[veonz121.github.io/VRCX-Launcher-Theme](https://veonz121.github.io/VRCX-Launcher-Theme/)**
 
 The preview runs in your browser with fake friends and instances, so you can click around, page through cards, try the themes and open the menus. Joining is simulated. Nothing connects to VRChat.
 
@@ -100,7 +100,7 @@ The theme replaces VRCX's interface files. Your VRCX data, login, settings and d
 
 **You need:** VRCX for Windows, installed normally (version 2026.11.x; see [Compatibility](#compatibility)).
 
-1. **Download** `VRCX-launcher-html.zip` from the [latest release](https://github.com/vEonz/VRCX-Launcher-Theme/releases/latest).
+1. **Download** `VRCX-launcher-html.zip` from the [latest release](https://github.com/vEonz121/VRCX-Launcher-Theme/releases/latest).
 2. **Close VRCX completely**, including the tray icon (right-click it, then Quit).
 3. **Open the VRCX install folder.** It's usually `C:\Program Files\VRCX`. You can also right-click the VRCX shortcut, then *Open file location*.
 4. **Rename** the existing `html` folder to `html_original`. This is your backup, so don't delete it.
@@ -130,7 +130,7 @@ This theme is built from VRCX source **2026.11.14**. The interface talks to VRCX
 You'll need **Node.js 24** and **npm 11**.
 
 ```bash
-git clone https://github.com/vEonz/VRCX-Launcher-Theme.git
+git clone https://github.com/vEonz121/VRCX-Launcher-Theme.git
 cd VRCX-Launcher-Theme
 npm ci
 
@@ -164,7 +164,7 @@ src/plugins/router.js       adds /home and /theme, and makes Home the start page
 ## Credits
 
 - **[VRCX](https://github.com/vrcx-team/VRCX)** by pypy, Natsumi and contributors. All the real functionality is theirs. Their original README is kept in [README-VRCX.md](README-VRCX.md).
-- Launcher theme by **vEonz**, styled and coded with the help of AI (Claude by Anthropic).
+- Launcher theme by **vEonz121**, styled and coded with the help of AI (Claude by Anthropic).
 - Not affiliated with VRChat Inc. or the VRCX team. Please don't send theme bugs to the VRCX team; open an issue here instead.
 
 ## License
