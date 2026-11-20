@@ -80,7 +80,11 @@
             </div>
         </div>
 
-        <NameplateEffect :nameplate-effect="userDialog.ref.nameplateEffect" />
+        <!-- VRChat nameplate cosmetic: the strip behind the name. Anchored to the bottom of the banner
+             (not a fixed 105px) so a full-size banner is never covered by it. -->
+        <div class="relative h-0">
+            <NameplateEffect :nameplate-effect="userDialog.ref.nameplateEffect" class="top-0!" />
+        </div>
 
         <div
             class="relative isolate flex flex-col gap-2 px-3 pb-3 pt-15 z-40 pointer-events-none *:pointer-events-auto">
