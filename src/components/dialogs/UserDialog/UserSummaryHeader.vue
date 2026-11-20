@@ -80,12 +80,6 @@
             </div>
         </div>
 
-        <!-- VRChat nameplate cosmetic: the strip behind the name. Anchored to the bottom of the banner
-             (not a fixed 105px) so a full-size banner is never covered by it. -->
-        <div class="relative h-0">
-            <NameplateEffect :nameplate-effect="userDialog.ref.nameplateEffect" class="top-0!" />
-        </div>
-
         <div
             class="relative isolate flex flex-col gap-2 px-3 pb-3 pt-15 z-40 pointer-events-none *:pointer-events-auto">
             <div class="flex gap-1.5 items-center">
@@ -548,7 +542,6 @@
     import { Badge } from '../../ui/badge';
     import { Checkbox } from '../../ui/checkbox';
     import IconFrame from '../../IconFrame.vue';
-    import NameplateEffect from '../../NameplateEffect.vue';
     import ProfileEffect from '../../ProfileEffect.vue';
 
     import UserActionDropdown from './UserActionDropdown.vue';
