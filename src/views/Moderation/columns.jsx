@@ -63,7 +63,7 @@ export const createColumns = ({ onDelete, onDeletePrompt }) => {
                 const label = te(typeKey) ? t(typeKey) : type;
 
                 return (
-                    <Badge variant="outline" class="text-muted-foreground">
+                    <Badge variant="outline" class="text-muted-foreground vl-type" data-log-type={type}>
                         {label}
                     </Badge>
                 );

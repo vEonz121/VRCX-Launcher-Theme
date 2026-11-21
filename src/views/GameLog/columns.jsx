@@ -74,7 +74,7 @@ export const createColumns = ({ getCreatedAt, onDelete, onDeletePrompt }) => {
                 const isLink = Boolean(original.location) && original.type !== 'Location';
 
                 return (
-                    <Badge variant="outline" class="text-muted-foreground">
+                    <Badge variant="outline" class="text-muted-foreground vl-type" data-log-type={original.type}>
                         <span
                             class={isLink ? 'cursor-pointer' : undefined}
                             onClick={() => isLink && showWorldDialog(original.location)}

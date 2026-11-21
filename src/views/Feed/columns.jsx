@@ -247,7 +247,7 @@ export const columns = [
             const type = row.getValue('type');
             return (
                 <div>
-                    <Badge variant="outline" class="text-muted-foreground">
+                    <Badge variant="outline" class="text-muted-foreground vl-type" data-log-type={type}>
                         {t(`view.feed.filters.${type}`)}
                     </Badge>
                 </div>

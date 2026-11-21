@@ -60,7 +60,7 @@ export const createColumns = ({ onDelete, onDeletePrompt }) => {
             cell: ({ row }) => {
                 const type = row.getValue('type');
                 return (
-                    <Badge variant="outline" class="text-muted-foreground">
+                    <Badge variant="outline" class="text-muted-foreground vl-type" data-log-type={type}>
                         {t(`view.friend_log.filters.${type}`)}
                     </Badge>
                 );

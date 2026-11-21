@@ -151,7 +151,7 @@ export const createColumns = ({
 
                 if (original.type === 'invite') {
                     return (
-                        <Badge variant="outline" class="text-muted-foreground">
+                        <Badge variant="outline" class="text-muted-foreground vl-type" data-log-type={original.type}>
                             {label}
                         </Badge>
                     );
@@ -159,7 +159,7 @@ export const createColumns = ({
 
                 if (original.type === 'group.queueReady' || original.type === 'instance.closed') {
                     return (
-                        <Badge variant="outline" class="text-muted-foreground">
+                        <Badge variant="outline" class="text-muted-foreground vl-type" data-log-type={original.type}>
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <span class="cursor-pointer" onClick={() => showWorldDialog(original.location)}>
@@ -183,7 +183,7 @@ export const createColumns = ({
 
                 if (original.link) {
                     return (
-                        <Badge variant="outline" class="text-muted-foreground">
+                        <Badge variant="outline" class="text-muted-foreground vl-type" data-log-type={original.type}>
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <span class="cursor-pointer" onClick={() => openNotificationLink(original.link)}>
@@ -199,7 +199,7 @@ export const createColumns = ({
                 }
 
                 return (
-                    <Badge variant="outline" class="text-muted-foreground">
+                    <Badge variant="outline" class="text-muted-foreground vl-type" data-log-type={original.type}>
                         {label}
                     </Badge>
                 );

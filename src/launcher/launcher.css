@@ -1689,3 +1689,59 @@ html.vl-launcher [data-slot='table-row']:hover {
         grid-template-columns: 1fr;
     }
 }
+
+/* ---------- coloured type pills in logs (Friend Log, Game Log, Feed, Notifications, Moderation) ---------- */
+html.vl-launcher .vl-type {
+    --t-h: var(--vl-hue);
+    --t-c: 0.14;
+    border-radius: 999px;
+    padding: 2px 10px;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.01em;
+    color: oklch(0.88 0.1 var(--t-h)) !important;
+    background: oklch(0.6 var(--t-c) var(--t-h) / 0.22);
+    border-color: oklch(0.7 var(--t-c) var(--t-h) / 0.35);
+}
+/* joined / added / online → green */
+html.vl-launcher .vl-type:is(
+    [data-log-type='Friend'], [data-log-type='Confirm'], [data-log-type='OnPlayerJoined'], [data-log-type='Online'],
+    [data-log-type='unblock'], [data-log-type='unmute'], [data-log-type='interactOn'], [data-log-type='unmuteChat']
+) {
+    --t-h: 150;
+}
+/* left / removed / offline / blocked → red */
+html.vl-launcher .vl-type:is(
+    [data-log-type='Unfriend'], [data-log-type='CancelFriendRequest'], [data-log-type='OnPlayerLeft'],
+    [data-log-type='Offline'], [data-log-type='block'], [data-log-type='mute'], [data-log-type='interactOff'],
+    [data-log-type='muteChat']
+) {
+    --t-h: 25;
+    --t-c: 0.17;
+}
+/* identity changes → purple */
+html.vl-launcher .vl-type:is(
+    [data-log-type='DisplayName'], [data-log-type='Avatar'], [data-log-type='Bio'], [data-log-type='Status']
+) {
+    --t-h: 300;
+}
+/* trust / requests / events → amber */
+html.vl-launcher .vl-type:is(
+    [data-log-type='TrustLevel'], [data-log-type='FriendRequest'], [data-log-type='friendRequest'],
+    [data-log-type='Event'], [data-log-type='External']
+) {
+    --t-h: 75;
+}
+/* places / invites → blue */
+html.vl-launcher .vl-type:is(
+    [data-log-type='Location'], [data-log-type='GPS'], [data-log-type='PortalSpawn'], [data-log-type='invite'],
+    [data-log-type='requestInvite'], [data-log-type='inviteResponse'], [data-log-type='requestInviteResponse']
+) {
+    --t-h: 235;
+}
+/* media → pink */
+html.vl-launcher .vl-type:is(
+    [data-log-type='VideoPlay'], [data-log-type='StringLoad'], [data-log-type='ImageLoad']
+) {
+    --t-h: 345;
+}
